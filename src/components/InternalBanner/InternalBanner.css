@@ -1,0 +1,13 @@
+.internal-banner {
+  width: 92%;
+  max-width: 1280px;
+  margin: 18px auto 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.internal-banner-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}

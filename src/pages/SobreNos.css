@@ -1,0 +1,138 @@
+.sobre-page-content {
+  width: 92%;
+  max-width: 1280px;
+  margin: 45px auto 80px;
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 45px;
+  align-items: start;
+}
+
+.sobre-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sobre-menu button {
+  height: 58px;
+  border: 1px solid #dfe7ef;
+  background: #ffffff;
+  color: #062653;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+  padding: 0 22px;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 8px 22px rgba(6, 38, 83, 0.06);
+}
+
+.sobre-menu button:hover,
+.sobre-menu button.active {
+  background: #08b8c4;
+  color: #ffffff;
+  border-color: #08b8c4;
+}
+
+.sobre-text-box {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 45px 55px;
+  box-shadow: 0 12px 35px rgba(6, 38, 83, 0.08);
+  border-left: 4px solid #08b8c4;
+}
+
+.sobre-text-box h1 {
+  color: #062653;
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.sobre-text-box p {
+  color: #4f5f70;
+  font-size: 18px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.sobre-voltar {
+  display: inline-block;
+  margin-top: 24px;
+  background: linear-gradient(90deg, #062653, #08b8c4);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 14px 60px;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .sobre-page-content {
+    grid-template-columns: 1fr;
+  }
+
+  .sobre-text-box {
+    padding: 35px 28px;
+  }
+}
+.sobre-menu-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.sobre-menu button {
+  display: flex;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .sobre-page-content {
+    width: 92%;
+    margin: 28px auto 45px;
+    gap: 18px;
+  }
+
+  .sobre-menu {
+    gap: 10px;
+  }
+
+  .sobre-menu button {
+    height: 46px;
+    font-size: 13px;
+    padding: 0 16px;
+    border-radius: 8px;
+  }
+
+  .sobre-menu-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+  }
+
+  .sobre-text-box {
+    padding: 28px 22px;
+    border-left: 3px solid #08b8c4;
+    border-radius: 14px;
+  }
+
+  .sobre-text-box h1 {
+    font-size: 26px;
+    margin-bottom: 16px;
+  }
+
+  .sobre-text-box p {
+    font-size: 14px;
+    line-height: 1.65;
+    margin-bottom: 12px;
+  }
+
+  .sobre-voltar {
+    padding: 12px 36px;
+    font-size: 15px;
+  }
+}
