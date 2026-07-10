@@ -3,7 +3,7 @@ import { buscarTodosProdutos } from "../../services/produtos";
 import "./SearchBar.css";
 
 const CATALOGO_URL =
-  "https://importadorakontudosurf.pedidook.com.br/";
+  "https://importadorakontudosurf.pedidook.com.br";
 
 function normalizarTexto(texto = "") {
   return String(texto)
@@ -93,11 +93,16 @@ function SearchBar() {
   }, [busca, produtos]);
 
   function abrirProduto(produto) {
-    const categoria = produto.categoria?.trim();
+    if (!produto?.id) {
+      window.open(
+        `${CATALOGO_URL}/`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+      return;
+    }
 
-    const url = categoria
-      ? `${CATALOGO_URL}?categoria=${encodeURIComponent(categoria)}`
-      : CATALOGO_URL;
+    const url = `${CATALOGO_URL}/produto/${produto.id}`;
 
     window.open(url, "_blank", "noopener,noreferrer");
   }
@@ -228,7 +233,7 @@ function SearchBar() {
                       </span>
 
                       <span className="search-product-action">
-                        Ver no catálogo
+                        Ver produto
                         <span aria-hidden="true">→</span>
                       </span>
                     </div>
