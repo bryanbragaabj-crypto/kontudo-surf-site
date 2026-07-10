@@ -92,12 +92,14 @@ function SearchBar() {
       .slice(0, 50);
   }, [busca, produtos]);
 
-  function abrirCatalogo() {
-    window.open(
-      CATALOGO_URL,
-      "_blank",
-      "noopener,noreferrer"
-    );
+  function abrirProduto(produto) {
+    const categoria = produto.categoria?.trim();
+
+    const url = categoria
+      ? `${CATALOGO_URL}?categoria=${encodeURIComponent(categoria)}`
+      : CATALOGO_URL;
+
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   const mostrarResultados = busca.trim().length >= 2;
@@ -185,7 +187,7 @@ function SearchBar() {
                   type="button"
                   key={produto.id || produto.codigo}
                   className="search-product"
-                  onClick={abrirCatalogo}
+                  onClick={() => abrirProduto(produto)}
                 >
                   <div className="search-product-icon">
                     <svg
@@ -194,7 +196,7 @@ function SearchBar() {
                       aria-hidden="true"
                     >
                       <path
-                        d="M4 7l8-4 8 4-8 4-8-4zM4 7v10l8 4 8-4V7M12 11v10"
+                        d="M8 4 5 6 2.5 10l3 2L7 10v10h10V10l1.5 2 3-2L19 6l-3-2c-.8 1.2-2.2 2-4 2s-3.2-.8-4-2Z"
                         stroke="currentColor"
                         strokeWidth="1.7"
                         strokeLinecap="round"
