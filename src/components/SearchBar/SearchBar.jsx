@@ -13,6 +13,19 @@ function normalizarTexto(texto = "") {
     .trim();
 }
 
+function formatarPreco(valor) {
+  const preco = Number(valor);
+
+  if (!Number.isFinite(preco) || preco <= 0) {
+    return "Preço sob consulta";
+  }
+
+  return preco.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
 function SearchBar() {
   const [busca, setBusca] = useState("");
   const [produtos, setProdutos] = useState([]);
@@ -33,7 +46,7 @@ function SearchBar() {
           setProdutos(produtosRecebidos);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao carregar produtos:", error);
 
         if (componenteAtivo) {
           setErro("Não foi possível carregar os produtos.");
@@ -76,7 +89,7 @@ function SearchBar() {
           normalizarTexto(campo).includes(termo)
         );
       })
-      .slice(0, 10);
+      .slice(0, 50);
   }, [busca, produtos]);
 
   function abrirCatalogo() {
@@ -109,6 +122,7 @@ function SearchBar() {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeWidth="2"
@@ -123,15 +137,39 @@ function SearchBar() {
             value={busca}
             onChange={(event) => setBusca(event.target.value)}
             placeholder="Digite o nome, código ou referência..."
+            aria-label="Pesquisar produtos"
           />
+
+          {busca && (
+            <button
+              type="button"
+              className="search-clear"
+              onClick={() => setBusca("")}
+              aria-label="Limpar pesquisa"
+            >
+              ×
+            </button>
+          )}
         </div>
 
         {mostrarResultados && (
           <div className="search-results">
+            <div className="search-results-header">
+              <span>Resultados da pesquisa</span>
+
+              {!carregando && !erro && (
+                <small>
+                  {resultados.length} produto
+                  {resultados.length !== 1 ? "s" : ""}
+                </small>
+              )}
+            </div>
+
             {carregando && (
-              <p className="search-message">
-                Carregando produtos...
-              </p>
+              <div className="search-loading">
+                <span className="search-spinner"></span>
+                <p>Carregando produtos...</p>
+              </div>
             )}
 
             {!carregando && erro && (
@@ -168,27 +206,59 @@ function SearchBar() {
                   <div className="search-product-info">
                     <strong>{produto.nome}</strong>
 
-                    <span>
-                      Código: {produto.codigo || "Não informado"}
-                    </span>
+                    <div className="search-product-meta">
+                      <span>
+                        Cód. {produto.codigo || "Não informado"}
+                      </span>
 
-                    {produto.categoria && (
-                      <small>{produto.categoria}</small>
-                    )}
+                      {produto.categoria && (
+                        <span>{produto.categoria}</span>
+                      )}
+
+                      {produto.referencia && (
+                        <span>Ref. {produto.referencia}</span>
+                      )}
+                    </div>
+
+                    <div className="search-product-bottom">
+                      <span className="search-product-price">
+                        {formatarPreco(produto.venda)}
+                      </span>
+
+                      <span className="search-product-action">
+                        Ver no catálogo
+                        <span aria-hidden="true">→</span>
+                      </span>
+                    </div>
                   </div>
-
-                  <span className="search-product-arrow">
-                    →
-                  </span>
                 </button>
               ))}
 
             {!carregando &&
               !erro &&
               resultados.length === 0 && (
-                <p className="search-message">
-                  Nenhum produto encontrado.
-                </p>
+                <div className="search-empty">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M21 21l-5.2-5.2m2.2-5.3a7 7 0 11-14 0 7 7 0 0114 0z"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+
+                  <strong>Nenhum produto encontrado</strong>
+
+                  <p>
+                    Tente pesquisar usando outro nome, código ou
+                    referência.
+                  </p>
+                </div>
               )}
           </div>
         )}
