@@ -1,23 +1,102 @@
-import { useState } from "react";
-import categories from "../../data/categories";
+import { useEffect, useMemo, useState } from "react";
+import { buscarTodosProdutos } from "../../services/produtos";
 import "./SearchBar.css";
+
+const CATALOGO_URL =
+  "https://importadorakontudosurf.pedidook.com.br/";
+
+function normalizarTexto(texto = "") {
+  return String(texto)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
 
 function SearchBar() {
   const [busca, setBusca] = useState("");
+  const [produtos, setProdutos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
 
-  const resultados = categories.filter((categoria) =>
-    categoria.nome.toLowerCase().includes(busca.toLowerCase())
-  );
+  useEffect(() => {
+    let componenteAtivo = true;
 
-  const abrirCategoria = (link) => {
-    window.open(link, "_blank", "noopener,noreferrer");
-  };
+    async function carregarProdutos() {
+      try {
+        setCarregando(true);
+        setErro("");
+
+        const produtosRecebidos = await buscarTodosProdutos();
+
+        if (componenteAtivo) {
+          setProdutos(produtosRecebidos);
+        }
+      } catch (error) {
+        console.error(error);
+
+        if (componenteAtivo) {
+          setErro("Não foi possível carregar os produtos.");
+        }
+      } finally {
+        if (componenteAtivo) {
+          setCarregando(false);
+        }
+      }
+    }
+
+    carregarProdutos();
+
+    return () => {
+      componenteAtivo = false;
+    };
+  }, []);
+
+  const resultados = useMemo(() => {
+    const termo = normalizarTexto(busca);
+
+    if (termo.length < 2) {
+      return [];
+    }
+
+    return produtos
+      .filter((produto) => {
+        const campos = [
+          produto.nome,
+          produto.codigo,
+          produto.referencia,
+          produto["referência"],
+          produto.categoria,
+          produto.marca,
+          produto.observacao,
+          produto["observação"],
+        ];
+
+        return campos.some((campo) =>
+          normalizarTexto(campo).includes(termo)
+        );
+      })
+      .slice(0, 10);
+  }, [busca, produtos]);
+
+  function abrirCatalogo() {
+    window.open(
+      CATALOGO_URL,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }
+
+  const mostrarResultados = busca.trim().length >= 2;
 
   return (
     <section className="search-section">
       <div className="search-title">
         <h2>Encontre produtos para sua loja</h2>
-        <p>Pesquise por nome, referência ou categoria</p>
+
+        <p>
+          Pesquise por nome, código, referência ou categoria
+        </p>
       </div>
 
       <div className="search-area">
@@ -42,26 +121,75 @@ function SearchBar() {
           <input
             type="text"
             value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Ex.: Calças, Blusas, Jaqueta..."
+            onChange={(event) => setBusca(event.target.value)}
+            placeholder="Digite o nome, código ou referência..."
           />
         </div>
 
-        {busca && (
+        {mostrarResultados && (
           <div className="search-results">
-            {resultados.length > 0 ? (
-              resultados.map((categoria) => (
-                <button
-                  key={categoria.id}
-                  onClick={() => abrirCategoria(categoria.link)}
-                >
-                  <img src={categoria.imagem} alt={categoria.nome} />
-                  <span>{categoria.nome}</span>
-                </button>
-              ))
-            ) : (
-              <p>Nenhuma categoria encontrada.</p>
+            {carregando && (
+              <p className="search-message">
+                Carregando produtos...
+              </p>
             )}
+
+            {!carregando && erro && (
+              <p className="search-message search-error">
+                {erro}
+              </p>
+            )}
+
+            {!carregando &&
+              !erro &&
+              resultados.map((produto) => (
+                <button
+                  type="button"
+                  key={produto.id || produto.codigo}
+                  className="search-product"
+                  onClick={abrirCatalogo}
+                >
+                  <div className="search-product-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M4 7l8-4 8 4-8 4-8-4zM4 7v10l8 4 8-4V7M12 11v10"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+
+                  <div className="search-product-info">
+                    <strong>{produto.nome}</strong>
+
+                    <span>
+                      Código: {produto.codigo || "Não informado"}
+                    </span>
+
+                    {produto.categoria && (
+                      <small>{produto.categoria}</small>
+                    )}
+                  </div>
+
+                  <span className="search-product-arrow">
+                    →
+                  </span>
+                </button>
+              ))}
+
+            {!carregando &&
+              !erro &&
+              resultados.length === 0 && (
+                <p className="search-message">
+                  Nenhum produto encontrado.
+                </p>
+              )}
           </div>
         )}
       </div>
