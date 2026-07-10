@@ -26,6 +26,167 @@ function formatarPreco(valor) {
   });
 }
 
+function ProductIcon({ categoria = "", nome = "" }) {
+  const texto = normalizarTexto(`${categoria} ${nome}`);
+
+  let tipo = "roupa";
+
+  if (texto.includes("calca")) {
+    tipo = "calca";
+  } else if (texto.includes("pijama")) {
+    tipo = "pijama";
+  } else if (texto.includes("jaqueta") || texto.includes("casaco")) {
+    tipo = "jaqueta";
+  } else if (texto.includes("blazer")) {
+    tipo = "blazer";
+  } else if (texto.includes("colete")) {
+    tipo = "colete";
+  } else if (
+    texto.includes("camisa") ||
+    texto.includes("blusa") ||
+    texto.includes("sueter")
+  ) {
+    tipo = "camisa";
+  } else if (texto.includes("conjunto")) {
+    tipo = "conjunto";
+  }
+
+  if (tipo === "calca") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M8 3h8l1 7-2 11h-4l-1-9-1 9H5L7 10l1-7Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M8 7h8M10 3v4M14 3v4"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (tipo === "pijama") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M8 4 5 6 3 10l3 2 1-2v5h10v-5l1 2 3-2-2-4-3-2c-.8 1.2-2.2 2-4 2s-3.2-.8-4-2Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M8 15 7 21h4l1-4 1 4h4l-1-6"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (tipo === "jaqueta") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M8 4 5 6 3 11l3 2 1-2v10h10V11l1 2 3-2-2-5-3-2-4 3-4-3Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12 7v14M9 10h6M9 15h6"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (tipo === "blazer") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M8 4 5 6 3 11l3 2 1-2v10h10V11l1 2 3-2-2-5-3-2-4 3-4-3Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="m9 7 3 5 3-5M12 12v9M9 15h1M14 15h1"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (tipo === "colete") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M8 4 5 7v14h14V7l-3-3-4 3-4-3Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12 7v14M8 10h2M14 10h2"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (tipo === "conjunto") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M7 4 4 6 2.5 10l3 2L7 10v6h6v-6l1.5 2 3-2L16 6l-3-2c-.7 1.1-1.7 1.7-3 1.7S7.7 5.1 7 4Z"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M15 14h5l1 7h-3l-.5-4-.5 4h-3l1-7Z"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M8 4 5 6 2.5 10l3 2L7 10v10h10V10l1.5 2 3-2L19 6l-3-2c-.8 1.2-2.2 2-4 2s-3.2-.8-4-2Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function SearchBar() {
   const [busca, setBusca] = useState("");
   const [produtos, setProdutos] = useState([]);
@@ -114,9 +275,7 @@ function SearchBar() {
       <div className="search-title">
         <h2>Encontre produtos para sua loja</h2>
 
-        <p>
-          Pesquise por nome, código, referência ou categoria
-        </p>
+        <p>Pesquise por nome, código, referência ou categoria</p>
       </div>
 
       <div className="search-area">
@@ -180,9 +339,7 @@ function SearchBar() {
             )}
 
             {!carregando && erro && (
-              <p className="search-message search-error">
-                {erro}
-              </p>
+              <p className="search-message search-error">{erro}</p>
             )}
 
             {!carregando &&
@@ -195,19 +352,10 @@ function SearchBar() {
                   onClick={() => abrirProduto(produto)}
                 >
                   <div className="search-product-icon">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M8 4 5 6 2.5 10l3 2L7 10v10h10V10l1.5 2 3-2L19 6l-3-2c-.8 1.2-2.2 2-4 2s-3.2-.8-4-2Z"
-                        stroke="currentColor"
-                        strokeWidth="1.7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <ProductIcon
+                      categoria={produto.categoria}
+                      nome={produto.nome}
+                    />
                   </div>
 
                   <div className="search-product-info">
