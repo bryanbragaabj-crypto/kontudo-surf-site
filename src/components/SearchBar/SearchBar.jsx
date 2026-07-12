@@ -26,29 +26,43 @@ function formatarPreco(valor) {
   });
 }
 
+function limparNomeCategoria(categoria = "") {
+  return String(categoria)
+    .replace(/^[A-Z0-9]+\s*-\s*/i, "")
+    .trim();
+}
+
 function ProductIcon({ categoria = "", nome = "" }) {
   const texto = normalizarTexto(`${categoria} ${nome}`);
 
   let tipo = "roupa";
 
-  if (texto.includes("calca")) {
+  if (
+    texto.includes("calca") ||
+    texto.includes("bermuda") ||
+    texto.includes("short")
+  ) {
     tipo = "calca";
   } else if (texto.includes("pijama")) {
     tipo = "pijama";
-  } else if (texto.includes("jaqueta") || texto.includes("casaco")) {
+  } else if (
+    texto.includes("jaqueta") ||
+    texto.includes("casaco")
+  ) {
     tipo = "jaqueta";
   } else if (texto.includes("blazer")) {
     tipo = "blazer";
   } else if (texto.includes("colete")) {
     tipo = "colete";
+  } else if (texto.includes("conjunto")) {
+    tipo = "conjunto";
   } else if (
     texto.includes("camisa") ||
     texto.includes("blusa") ||
-    texto.includes("sueter")
+    texto.includes("sueter") ||
+    texto.includes("tricot")
   ) {
     tipo = "camisa";
-  } else if (texto.includes("conjunto")) {
-    tipo = "conjunto";
   }
 
   if (tipo === "calca") {
@@ -61,6 +75,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+
         <path
           d="M8 7h8M10 3v4M14 3v4"
           stroke="currentColor"
@@ -81,6 +96,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+
         <path
           d="M8 15 7 21h4l1-4 1 4h4l-1-6"
           stroke="currentColor"
@@ -102,6 +118,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+
         <path
           d="M12 7v14M9 10h6M9 15h6"
           stroke="currentColor"
@@ -122,6 +139,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+
         <path
           d="m9 7 3 5 3-5M12 12v9M9 15h1M14 15h1"
           stroke="currentColor"
@@ -143,6 +161,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+
         <path
           d="M12 7v14M8 10h2M14 10h2"
           stroke="currentColor"
@@ -163,6 +182,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+
         <path
           d="M15 14h5l1 7h-3l-.5-4-.5 4h-3l1-7Z"
           stroke="currentColor"
@@ -187,6 +207,14 @@ function ProductIcon({ categoria = "", nome = "" }) {
   );
 }
 
+function CategoryIcon({ categoria }) {
+  return (
+    <div className="search-category-icon">
+      <ProductIcon categoria={categoria} nome={categoria} />
+    </div>
+  );
+}
+
 function SearchBar() {
   const [busca, setBusca] = useState("");
   const [produtos, setProdutos] = useState([]);
@@ -201,16 +229,22 @@ function SearchBar() {
         setCarregando(true);
         setErro("");
 
-        const produtosRecebidos = await buscarTodosProdutos();
+        const produtosRecebidos =
+          await buscarTodosProdutos();
 
         if (componenteAtivo) {
           setProdutos(produtosRecebidos);
         }
       } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
+        console.error(
+          "Erro ao carregar produtos:",
+          error
+        );
 
         if (componenteAtivo) {
-          setErro("Não foi possível carregar os produtos.");
+          setErro(
+            "Não foi possível carregar os produtos."
+          );
         }
       } finally {
         if (componenteAtivo) {
@@ -253,6 +287,68 @@ function SearchBar() {
       .slice(0, 50);
   }, [busca, produtos]);
 
+  const categoriasEncontradas = useMemo(() => {
+    const termo = normalizarTexto(busca);
+
+    if (termo.length < 2) {
+      return [];
+    }
+
+    const categoriasMap = new Map();
+
+    produtos.forEach((produto) => {
+      if (!produto.categoria) {
+        return;
+      }
+
+      const categoriaOriginal =
+        produto.categoria.trim();
+
+      const categoriaLimpa =
+        limparNomeCategoria(categoriaOriginal);
+
+      const nomeProduto =
+        normalizarTexto(produto.nome);
+
+      const categoriaNormalizada =
+        normalizarTexto(
+          `${categoriaOriginal} ${categoriaLimpa}`
+        );
+
+      const encontrouCategoria =
+        categoriaNormalizada.includes(termo);
+
+      const encontrouProduto =
+        nomeProduto.includes(termo);
+
+      if (
+        encontrouCategoria ||
+        encontrouProduto
+      ) {
+        if (!categoriasMap.has(categoriaOriginal)) {
+          categoriasMap.set(categoriaOriginal, {
+            original: categoriaOriginal,
+            nome: categoriaLimpa,
+            quantidade: 1,
+          });
+        } else {
+          const categoriaAtual =
+            categoriasMap.get(categoriaOriginal);
+
+          categoriaAtual.quantidade += 1;
+        }
+      }
+    });
+
+    return Array.from(categoriasMap.values())
+      .sort(
+        (categoriaA, categoriaB) =>
+          categoriaB.quantidade -
+          categoriaA.quantidade
+      )
+      .slice(0, 5);
+  }, [busca, produtos]);
+
   function abrirProduto(produto) {
     if (!produto?.id) {
       window.open(
@@ -260,22 +356,38 @@ function SearchBar() {
         "_blank",
         "noopener,noreferrer"
       );
+
       return;
     }
 
-    const url = `${CATALOGO_URL}/produto/${produto.id}`;
+    const url =
+      `${CATALOGO_URL}/produto/${produto.id}`;
 
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
-  const mostrarResultados = busca.trim().length >= 2;
+  function selecionarCategoria(categoria) {
+    setBusca(categoria.nome);
+  }
+
+  const mostrarResultados =
+    busca.trim().length >= 2;
 
   return (
     <section className="search-section">
       <div className="search-title">
-        <h2>Encontre produtos para sua loja</h2>
+        <h2>
+          Encontre produtos para sua loja
+        </h2>
 
-        <p>Pesquise por nome, código, referência ou categoria</p>
+        <p>
+          Pesquise por nome, código, referência ou
+          categoria
+        </p>
       </div>
 
       <div className="search-area">
@@ -301,7 +413,9 @@ function SearchBar() {
           <input
             type="text"
             value={busca}
-            onChange={(event) => setBusca(event.target.value)}
+            onChange={(event) =>
+              setBusca(event.target.value)
+            }
             placeholder="Digite o nome, código ou referência..."
             aria-label="Pesquisar produtos"
           />
@@ -320,101 +434,179 @@ function SearchBar() {
 
         {mostrarResultados && (
           <div className="search-results">
-            <div className="search-results-header">
-              <span>Resultados da pesquisa</span>
-
-              {!carregando && !erro && (
-                <small>
-                  {resultados.length} produto
-                  {resultados.length !== 1 ? "s" : ""}
-                </small>
-              )}
-            </div>
-
             {carregando && (
               <div className="search-loading">
                 <span className="search-spinner"></span>
+
                 <p>Carregando produtos...</p>
               </div>
             )}
 
             {!carregando && erro && (
-              <p className="search-message search-error">{erro}</p>
+              <p className="search-message search-error">
+                {erro}
+              </p>
             )}
 
             {!carregando &&
               !erro &&
-              resultados.map((produto) => (
-                <button
-                  type="button"
-                  key={produto.id || produto.codigo}
-                  className="search-product"
-                  onClick={() => abrirProduto(produto)}
-                >
-                  <div className="search-product-icon">
-                    <ProductIcon
-                      categoria={produto.categoria}
-                      nome={produto.nome}
-                    />
+              categoriasEncontradas.length > 0 && (
+                <div className="search-category-section">
+                  <div className="search-section-label">
+                    <span>Categorias encontradas</span>
+
+                    <small>
+                      {categoriasEncontradas.length}
+                    </small>
                   </div>
 
-                  <div className="search-product-info">
-                    <strong>{produto.nome}</strong>
+                  <div className="search-category-list">
+                    {categoriasEncontradas.map(
+                      (categoria) => (
+                        <button
+                          type="button"
+                          className="search-category-card"
+                          key={categoria.original}
+                          onClick={() =>
+                            selecionarCategoria(
+                              categoria
+                            )
+                          }
+                        >
+                          <CategoryIcon
+                            categoria={
+                              categoria.original
+                            }
+                          />
 
-                    <div className="search-product-meta">
-                      <span>
-                        Cód. {produto.codigo || "Não informado"}
-                      </span>
+                          <div className="search-category-info">
+                            <strong>
+                              {categoria.nome}
+                            </strong>
 
-                      {produto.categoria && (
-                        <span>{produto.categoria}</span>
-                      )}
+                            <span>
+                              {categoria.quantidade} produto
+                              {categoria.quantidade !== 1
+                                ? "s"
+                                : ""}
+                            </span>
+                          </div>
 
-                      {produto.referencia && (
-                        <span>Ref. {produto.referencia}</span>
-                      )}
-                    </div>
-
-                    <div className="search-product-bottom">
-                      <span className="search-product-price">
-                        {formatarPreco(produto.venda)}
-                      </span>
-
-                      <span className="search-product-action">
-                        Ver produto
-                        <span aria-hidden="true">→</span>
-                      </span>
-                    </div>
+                          <span className="search-category-arrow">
+                            →
+                          </span>
+                        </button>
+                      )
+                    )}
                   </div>
-                </button>
-              ))}
-
-            {!carregando &&
-              !erro &&
-              resultados.length === 0 && (
-                <div className="search-empty">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M21 21l-5.2-5.2m2.2-5.3a7 7 0 11-14 0 7 7 0 0114 0z"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-
-                  <strong>Nenhum produto encontrado</strong>
-
-                  <p>
-                    Tente pesquisar usando outro nome, código ou
-                    referência.
-                  </p>
                 </div>
               )}
+
+            {!carregando && !erro && (
+              <div className="search-products-section">
+                <div className="search-section-label">
+                  <span>Produtos relevantes</span>
+
+                  <small>
+                    {resultados.length} produto
+                    {resultados.length !== 1 ? "s" : ""}
+                  </small>
+                </div>
+
+                {resultados.length > 0 ? (
+                  resultados.map((produto) => (
+                    <button
+                      type="button"
+                      key={
+                        produto.id ||
+                        produto.codigo
+                      }
+                      className="search-product"
+                      onClick={() =>
+                        abrirProduto(produto)
+                      }
+                    >
+                      <div className="search-product-icon">
+                        <ProductIcon
+                          categoria={
+                            produto.categoria
+                          }
+                          nome={produto.nome}
+                        />
+                      </div>
+
+                      <div className="search-product-info">
+                        <strong>
+                          {produto.nome}
+                        </strong>
+
+                        <div className="search-product-meta">
+                          <span>
+                            Cód.{" "}
+                            {produto.codigo ||
+                              "Não informado"}
+                          </span>
+
+                          {produto.categoria && (
+                            <span>
+                              {produto.categoria}
+                            </span>
+                          )}
+
+                          {produto.referencia && (
+                            <span>
+                              Ref.{" "}
+                              {produto.referencia}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="search-product-bottom">
+                          <span className="search-product-price">
+                            {formatarPreco(
+                              produto.venda
+                            )}
+                          </span>
+
+                          <span className="search-product-action">
+                            Ver produto
+
+                            <span aria-hidden="true">
+                              →
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="search-empty">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M21 21l-5.2-5.2m2.2-5.3a7 7 0 11-14 0 7 7 0 0114 0z"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+
+                    <strong>
+                      Nenhum produto encontrado
+                    </strong>
+
+                    <p>
+                      Tente pesquisar usando outro
+                      nome, código ou referência.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
