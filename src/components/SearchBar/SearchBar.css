@@ -96,7 +96,6 @@
   width: 100%;
   max-height: 620px;
   overflow-y: auto;
-  overscroll-behavior: contain;
   padding: 15px;
   background: #ffffff;
   border: 1px solid #dce8f0;
@@ -109,23 +108,15 @@
   width: 7px;
 }
 
-.search-results::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 .search-results::-webkit-scrollbar-thumb {
   background: #c8d9e5;
   border-radius: 10px;
 }
 
 .search-category-section {
-  padding-bottom: 16px;
+  padding-bottom: 17px;
   margin-bottom: 17px;
   border-bottom: 1px solid #e8eff4;
-}
-
-.search-products-section {
-  width: 100%;
 }
 
 .search-section-label {
@@ -151,24 +142,18 @@
   font-weight: 800;
 }
 
-.search-category-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
 .search-category-card {
   width: 100%;
-  min-height: 76px;
+  min-height: 86px;
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 12px;
+  gap: 16px;
+  padding: 12px 16px;
   border: 1px solid #dce8f0;
-  border-radius: 14px;
+  border-radius: 15px;
   background: linear-gradient(
     135deg,
-    #f9fdff,
+    #f7fdff,
     #ffffff
   );
   text-align: left;
@@ -179,24 +164,26 @@
 .search-category-card:hover {
   border-color: #08b8c4;
   transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(6, 38, 83, 0.09);
+  box-shadow: 0 12px 28px rgba(6, 38, 83, 0.1);
 }
 
-.search-category-icon {
-  width: 48px;
-  height: 48px;
+.search-category-image {
+  width: 68px;
+  height: 62px;
   flex-shrink: 0;
   border-radius: 13px;
-  background: #e8fafb;
-  color: #08b8c4;
+  overflow: hidden;
+  background: #eef9fb;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.search-category-icon svg {
-  width: 25px;
-  height: 25px;
+.search-category-image img {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  object-fit: contain;
 }
 
 .search-category-info {
@@ -204,25 +191,24 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .search-category-info strong {
   color: #062653;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 800;
-  text-transform: capitalize;
 }
 
 .search-category-info span {
   color: #7b8798;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .search-category-arrow {
   color: #08b8c4;
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 800;
 }
 
@@ -328,13 +314,6 @@
 
 .search-product-action span {
   font-size: 19px;
-  transition: transform 0.2s ease;
-}
-
-.search-product:hover
-  .search-product-action
-  span {
-  transform: translateX(4px);
 }
 
 .search-message {
@@ -373,7 +352,7 @@
 }
 
 .search-empty {
-  min-height: 180px;
+  min-height: 150px;
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
@@ -383,32 +362,19 @@
   text-align: center;
 }
 
-.search-empty svg {
-  width: 38px;
-  height: 38px;
-  color: #08b8c4;
-  margin-bottom: 5px;
-}
-
 .search-empty strong {
   color: #062653;
   font-size: 17px;
 }
 
 .search-empty p {
-  max-width: 390px;
   color: #7b8798;
   font-size: 14px;
-  line-height: 1.5;
 }
 
 @media (max-width: 768px) {
   .search-section {
     padding: 38px 14px 46px;
-  }
-
-  .search-title {
-    margin-bottom: 22px;
   }
 
   .search-title h2 {
@@ -422,7 +388,6 @@
   .search-box {
     min-height: 58px;
     padding: 0 18px;
-    gap: 12px;
     border-radius: 29px;
   }
 
@@ -436,35 +401,19 @@
     border-radius: 16px;
   }
 
-  .search-section-label {
-    padding: 4px 4px 11px;
-  }
-
-  .search-section-label span {
-    font-size: 13px;
-  }
-
-  .search-section-label small {
-    font-size: 9px;
-  }
-
-  .search-category-list {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
   .search-category-card {
-    min-height: 65px;
-    padding: 9px;
+    min-height: 72px;
+    padding: 9px 11px;
+    gap: 11px;
   }
 
-  .search-category-icon {
-    width: 42px;
-    height: 42px;
+  .search-category-image {
+    width: 55px;
+    height: 52px;
   }
 
   .search-category-info strong {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .search-category-info span {
@@ -474,28 +423,15 @@
   .search-product {
     gap: 11px;
     padding: 12px;
-    border-radius: 13px;
   }
 
   .search-product-icon {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
-  }
-
-  .search-product-icon svg {
-    width: 24px;
-    height: 24px;
   }
 
   .search-product-info strong {
     font-size: 13px;
-    margin-bottom: 7px;
-  }
-
-  .search-product-meta {
-    gap: 5px;
-    margin-bottom: 9px;
   }
 
   .search-product-meta span {

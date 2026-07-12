@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { buscarTodosProdutos } from "../../services/produtos";
+import categories from "../../data/categories";
 import "./SearchBar.css";
 
 const CATALOGO_URL =
@@ -26,46 +27,14 @@ function formatarPreco(valor) {
   });
 }
 
-function limparNomeCategoria(categoria = "") {
-  return String(categoria)
-    .replace(/^[A-Z0-9]+\s*-\s*/i, "")
-    .trim();
-}
-
 function ProductIcon({ categoria = "", nome = "" }) {
   const texto = normalizarTexto(`${categoria} ${nome}`);
-
-  let tipo = "roupa";
 
   if (
     texto.includes("calca") ||
     texto.includes("bermuda") ||
     texto.includes("short")
   ) {
-    tipo = "calca";
-  } else if (texto.includes("pijama")) {
-    tipo = "pijama";
-  } else if (
-    texto.includes("jaqueta") ||
-    texto.includes("casaco")
-  ) {
-    tipo = "jaqueta";
-  } else if (texto.includes("blazer")) {
-    tipo = "blazer";
-  } else if (texto.includes("colete")) {
-    tipo = "colete";
-  } else if (texto.includes("conjunto")) {
-    tipo = "conjunto";
-  } else if (
-    texto.includes("camisa") ||
-    texto.includes("blusa") ||
-    texto.includes("sueter") ||
-    texto.includes("tricot")
-  ) {
-    tipo = "camisa";
-  }
-
-  if (tipo === "calca") {
     return (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -75,7 +44,6 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-
         <path
           d="M8 7h8M10 3v4M14 3v4"
           stroke="currentColor"
@@ -86,7 +54,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
     );
   }
 
-  if (tipo === "pijama") {
+  if (texto.includes("pijama")) {
     return (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -96,7 +64,6 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-
         <path
           d="M8 15 7 21h4l1-4 1 4h4l-1-6"
           stroke="currentColor"
@@ -108,7 +75,10 @@ function ProductIcon({ categoria = "", nome = "" }) {
     );
   }
 
-  if (tipo === "jaqueta") {
+  if (
+    texto.includes("jaqueta") ||
+    texto.includes("casaco")
+  ) {
     return (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -118,7 +88,6 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-
         <path
           d="M12 7v14M9 10h6M9 15h6"
           stroke="currentColor"
@@ -129,7 +98,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
     );
   }
 
-  if (tipo === "blazer") {
+  if (texto.includes("blazer")) {
     return (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -139,7 +108,6 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-
         <path
           d="m9 7 3 5 3-5M12 12v9M9 15h1M14 15h1"
           stroke="currentColor"
@@ -151,7 +119,7 @@ function ProductIcon({ categoria = "", nome = "" }) {
     );
   }
 
-  if (tipo === "colete") {
+  if (texto.includes("colete")) {
     return (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -161,34 +129,11 @@ function ProductIcon({ categoria = "", nome = "" }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-
         <path
           d="M12 7v14M8 10h2M14 10h2"
           stroke="currentColor"
           strokeWidth="1.7"
           strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (tipo === "conjunto") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M7 4 4 6 2.5 10l3 2L7 10v6h6v-6l1.5 2 3-2L16 6l-3-2c-.7 1.1-1.7 1.7-3 1.7S7.7 5.1 7 4Z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        <path
-          d="M15 14h5l1 7h-3l-.5-4-.5 4h-3l1-7Z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
         />
       </svg>
     );
@@ -204,14 +149,6 @@ function ProductIcon({ categoria = "", nome = "" }) {
         strokeLinejoin="round"
       />
     </svg>
-  );
-}
-
-function CategoryIcon({ categoria }) {
-  return (
-    <div className="search-category-icon">
-      <ProductIcon categoria={categoria} nome={categoria} />
-    </div>
   );
 }
 
@@ -287,67 +224,65 @@ function SearchBar() {
       .slice(0, 50);
   }, [busca, produtos]);
 
-  const categoriasEncontradas = useMemo(() => {
+  const categoriaPrincipal = useMemo(() => {
     const termo = normalizarTexto(busca);
 
     if (termo.length < 2) {
-      return [];
+      return null;
     }
 
-    const categoriasMap = new Map();
+    const categoriaDireta = categories.find(
+      (categoria) => {
+        const nomeCategoria =
+          normalizarTexto(categoria.nome);
 
-    produtos.forEach((produto) => {
-      if (!produto.categoria) {
-        return;
-      }
-
-      const categoriaOriginal =
-        produto.categoria.trim();
-
-      const categoriaLimpa =
-        limparNomeCategoria(categoriaOriginal);
-
-      const nomeProduto =
-        normalizarTexto(produto.nome);
-
-      const categoriaNormalizada =
-        normalizarTexto(
-          `${categoriaOriginal} ${categoriaLimpa}`
+        return (
+          nomeCategoria.includes(termo) ||
+          termo.includes(nomeCategoria)
         );
-
-      const encontrouCategoria =
-        categoriaNormalizada.includes(termo);
-
-      const encontrouProduto =
-        nomeProduto.includes(termo);
-
-      if (
-        encontrouCategoria ||
-        encontrouProduto
-      ) {
-        if (!categoriasMap.has(categoriaOriginal)) {
-          categoriasMap.set(categoriaOriginal, {
-            original: categoriaOriginal,
-            nome: categoriaLimpa,
-            quantidade: 1,
-          });
-        } else {
-          const categoriaAtual =
-            categoriasMap.get(categoriaOriginal);
-
-          categoriaAtual.quantidade += 1;
-        }
       }
-    });
+    );
 
-    return Array.from(categoriasMap.values())
-      .sort(
-        (categoriaA, categoriaB) =>
-          categoriaB.quantidade -
-          categoriaA.quantidade
-      )
-      .slice(0, 5);
-  }, [busca, produtos]);
+    if (categoriaDireta) {
+      return categoriaDireta;
+    }
+
+    const contagemCategorias = categories.map(
+      (categoria) => {
+        const nomeCategoria =
+          normalizarTexto(categoria.nome);
+
+        const quantidade = resultados.filter(
+          (produto) => {
+            const textoProduto = normalizarTexto(
+              `${produto.nome} ${produto.categoria}`
+            );
+
+            return textoProduto.includes(
+              nomeCategoria
+            );
+          }
+        ).length;
+
+        return {
+          categoria,
+          quantidade,
+        };
+      }
+    );
+
+    const categoriaMaisRelevante =
+      contagemCategorias
+        .filter((item) => item.quantidade > 0)
+        .sort(
+          (itemA, itemB) =>
+            itemB.quantidade - itemA.quantidade
+        )[0];
+
+    return categoriaMaisRelevante
+      ? categoriaMaisRelevante.categoria
+      : null;
+  }, [busca, resultados]);
 
   function abrirProduto(produto) {
     if (!produto?.id) {
@@ -360,18 +295,29 @@ function SearchBar() {
       return;
     }
 
-    const url =
-      `${CATALOGO_URL}/produto/${produto.id}`;
-
     window.open(
-      url,
+      `${CATALOGO_URL}/produto/${produto.id}`,
       "_blank",
       "noopener,noreferrer"
     );
   }
 
-  function selecionarCategoria(categoria) {
-    setBusca(categoria.nome);
+  function abrirCategoria(categoria) {
+    if (!categoria?.link) {
+      window.open(
+        `${CATALOGO_URL}/`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      return;
+    }
+
+    window.open(
+      categoria.link,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
   const mostrarResultados =
@@ -437,7 +383,6 @@ function SearchBar() {
             {carregando && (
               <div className="search-loading">
                 <span className="search-spinner"></span>
-
                 <p>Carregando produtos...</p>
               </div>
             )}
@@ -450,55 +395,46 @@ function SearchBar() {
 
             {!carregando &&
               !erro &&
-              categoriasEncontradas.length > 0 && (
+              categoriaPrincipal && (
                 <div className="search-category-section">
                   <div className="search-section-label">
-                    <span>Categorias encontradas</span>
-
-                    <small>
-                      {categoriasEncontradas.length}
-                    </small>
+                    <span>Categoria encontrada</span>
                   </div>
 
-                  <div className="search-category-list">
-                    {categoriasEncontradas.map(
-                      (categoria) => (
-                        <button
-                          type="button"
-                          className="search-category-card"
-                          key={categoria.original}
-                          onClick={() =>
-                            selecionarCategoria(
-                              categoria
-                            )
-                          }
-                        >
-                          <CategoryIcon
-                            categoria={
-                              categoria.original
-                            }
-                          />
-
-                          <div className="search-category-info">
-                            <strong>
-                              {categoria.nome}
-                            </strong>
-
-                            <span>
-                              {categoria.quantidade} produto
-                              {categoria.quantidade !== 1
-                                ? "s"
-                                : ""}
-                            </span>
-                          </div>
-
-                          <span className="search-category-arrow">
-                            →
-                          </span>
-                        </button>
+                  <button
+                    type="button"
+                    className="search-category-card"
+                    onClick={() =>
+                      abrirCategoria(
+                        categoriaPrincipal
                       )
-                    )}
-                  </div>
+                    }
+                  >
+                    <div className="search-category-image">
+                      <img
+                        src={
+                          categoriaPrincipal.imagem
+                        }
+                        alt={
+                          categoriaPrincipal.nome
+                        }
+                      />
+                    </div>
+
+                    <div className="search-category-info">
+                      <strong>
+                        {categoriaPrincipal.nome}
+                      </strong>
+
+                      <span>
+                        Abrir categoria no PedidoOK
+                      </span>
+                    </div>
+
+                    <span className="search-category-arrow">
+                      →
+                    </span>
+                  </button>
                 </div>
               )}
 
@@ -509,7 +445,9 @@ function SearchBar() {
 
                   <small>
                     {resultados.length} produto
-                    {resultados.length !== 1 ? "s" : ""}
+                    {resultados.length !== 1
+                      ? "s"
+                      : ""}
                   </small>
                 </div>
 
@@ -570,7 +508,6 @@ function SearchBar() {
 
                           <span className="search-product-action">
                             Ver produto
-
                             <span aria-hidden="true">
                               →
                             </span>
@@ -581,20 +518,6 @@ function SearchBar() {
                   ))
                 ) : (
                   <div className="search-empty">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M21 21l-5.2-5.2m2.2-5.3a7 7 0 11-14 0 7 7 0 0114 0z"
-                        stroke="currentColor"
-                        strokeWidth="1.7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-
                     <strong>
                       Nenhum produto encontrado
                     </strong>
