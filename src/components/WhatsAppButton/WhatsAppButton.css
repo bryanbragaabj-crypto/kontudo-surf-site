@@ -4,30 +4,108 @@
   bottom: 28px;
   width: 64px;
   height: 64px;
-  background: #08b8c4;
-  color: #ffffff;
   border-radius: 50%;
+  background: #25d366;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  font-size: 34px;
-  font-weight: 800;
-  z-index: 2000;
-  box-shadow: 0 14px 35px rgba(8, 184, 196, 0.35);
-  transition: 0.25s ease;
+  z-index: 3000;
+  box-shadow:
+    0 14px 32px rgba(37, 211, 102, 0.35),
+    0 0 0 0 rgba(37, 211, 102, 0.4);
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+  animation: whatsapp-pulse 2.2s infinite;
 }
 
 .whatsapp-float:hover {
-  transform: translateY(-5px) scale(1.04);
-  background: #06a6b1;
+  background: #1fbd5a;
+  transform: translateY(-5px) scale(1.05);
+  box-shadow:
+    0 18px 38px rgba(37, 211, 102, 0.42),
+    0 0 0 10px rgba(37, 211, 102, 0.08);
 }
+
+.whatsapp-icon {
+  width: 34px;
+  height: 34px;
+  display: block;
+}
+
+.whatsapp-tooltip {
+  position: absolute;
+  right: 76px;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
+  background: #062653;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  padding: 10px 14px;
+  border-radius: 10px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: 0.22s ease;
+  box-shadow: 0 10px 25px rgba(6, 38, 83, 0.2);
+}
+
+.whatsapp-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  transform: translateY(-50%);
+  border-width: 6px 0 6px 7px;
+  border-style: solid;
+  border-color: transparent transparent transparent #062653;
+}
+
+.whatsapp-float:hover .whatsapp-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+@keyframes whatsapp-pulse {
+  0% {
+    box-shadow:
+      0 14px 32px rgba(37, 211, 102, 0.35),
+      0 0 0 0 rgba(37, 211, 102, 0.42);
+  }
+
+  70% {
+    box-shadow:
+      0 14px 32px rgba(37, 211, 102, 0.35),
+      0 0 0 14px rgba(37, 211, 102, 0);
+  }
+
+  100% {
+    box-shadow:
+      0 14px 32px rgba(37, 211, 102, 0.35),
+      0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
 @media (max-width: 900px) {
   .whatsapp-float {
     right: 18px;
     bottom: 100px;
     width: 58px;
     height: 58px;
-    font-size: 30px;
+  }
+
+  .whatsapp-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  .whatsapp-tooltip {
+    display: none;
   }
 }
